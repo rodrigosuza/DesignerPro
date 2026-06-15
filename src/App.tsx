@@ -22,8 +22,6 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-  const [iframeKey, setIframeKey] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,17 +64,11 @@ export default function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setIframeLoaded(false);
     localStorage.removeItem("melius_auth");
     sessionStorage.removeItem("melius_auth");
     // Clear input
     setPassword("");
     setError(null);
-  };
-
-  const handleRefreshIframe = () => {
-    setIframeLoaded(false);
-    setIframeKey(prev => prev + 1);
   };
 
   return (
@@ -242,76 +234,33 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Actions container with quick refresh */}
-              <div className="flex items-center space-x-2" id="header-actions">
-                <button
-                  onClick={handleRefreshIframe}
-                  id="refresh-iframe-button"
-                  className="p-2 hover:bg-neutral-100 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all duration-150 flex items-center justify-center"
-                  title="Recarregar página"
-                >
-                  <RefreshCw className={`w-4 h-4 ${!iframeLoaded ? 'animate-spin' : ''}`} />
-                </button>
-              </div>
             </header>
 
-            {/* Embedded Sandbox Viewport */}
-            <div className="flex-1 relative bg-neutral-900/5 flex flex-col justify-between" id="viewport-container">
-              {/* Loading State Overlay */}
-              {!iframeLoaded && (
-                <div className="absolute inset-0 bg-neutral-50/90 backdrop-blur-xs flex flex-col items-center justify-center p-6 z-40 transition-opacity duration-300" id="iframe-loading-overlay">
-                  <div className="flex flex-col items-center space-y-4">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-full border-2 border-neutral-200 border-t-neutral-900 animate-spin" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-neutral-950" />
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm font-semibold text-neutral-800">Processando acesso seguro...</p>
-                      <p className="text-xs text-neutral-400 mt-1">Carregando recursos em ambiente isolado</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* The Iframe to run Melius */}
-              <iframe
-                key={iframeKey}
-                id="internal-site-iframe"
-                src={TARGET_URL}
-                onLoad={() => setIframeLoaded(true)}
-                title="Designer Pro Website Workspace"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="no-referrer"
-                className="w-full h-full flex-1 border-0 shadow-inner bg-white"
-                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-              />
-
-              {/* Bottom Smart Help Utility Banner is kept highly minimal and helpful */}
-              <div 
-                className="bg-white border-t border-neutral-200/80 px-6 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-neutral-500 space-y-2 sm:space-y-0 text-center sm:text-left shadow-md z-40"
-                id="iframe-fallback-banner"
+            {/* Action Card Viewport */}
+            <div className="flex-1 relative bg-neutral-900/5 flex flex-col items-center justify-center p-6" id="viewport-container">
+              <motion.div 
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="bg-white border border-neutral-200 shadow-xl rounded-3xl p-8 max-w-lg w-full text-center"
               >
-                <div className="flex items-center justify-center sm:justify-start space-x-2">
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                  <span>
-                    Caso encontre problemas com restrições de moldura de segurança (iFrame) de terceiros:
-                  </span>
+                <div className="w-16 h-16 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                  <ShieldCheck className="w-8 h-8" />
                 </div>
-                <div className="flex justify-center sm:justify-end">
-                  <a
-                    href={TARGET_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-1 font-semibold text-neutral-900 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200 px-3 py-1 rounded-md transition-colors"
-                    id="fallback-direct-link"
-                  >
-                    <span>Abrir Link Diretamente</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
+                <h2 className="text-2xl font-bold text-neutral-900 mb-2">Acesso Liberado</h2>
+                <p className="text-neutral-500 mb-8 leading-relaxed text-sm">
+                  O sistema Melius possui restrições de segurança que impedem a exibição dentro de outras páginas (proteção de iFrame). Para acessar com total segurança, clique no botão abaixo e abra o sistema em uma nova aba.
+                </p>
+                <a
+                  href={TARGET_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center space-x-2 w-full px-6 py-4 rounded-xl bg-neutral-950 text-white font-semibold hover:bg-neutral-900 active:scale-[0.98] transition-all duration-150 shadow-md group"
+                >
+                  <span>Acessar Sistema Melius</span>
+                  <ExternalLink className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </motion.div>
             </div>
           </motion.div>
         )}
